@@ -6,37 +6,29 @@
 #include <asm/uaccess.h>
 
 MODULE_LICENSE("Dual BSD/GPL");
-MODULE_DESCRIPTION("Basic Driver PCIHello");
-MODULE_AUTHOR("Patrick Schaumont");
+MODULE_DESCRIPTION("FPGA driver for SoundBoard");
+MODULE_AUTHOR("Conducao do tio");
+
+#define SWITCHES            1
+#define BUTTONS             2
+#define GREEN_LED           3
+#define RED_LED             4
+#define SEVEN_DISPLAYS_4    5
+#define SEVEN_DISPLAYS_2    6
 
 
-enum Device {
-    switches,
-    buttons,
-    green_led,
-    red_led,
-    seven_displays_4,
-    seven_displays_2
-} device ;
-
-//-- Nossa Struct
-typedef struct DeviceData {
-    device id;
-    int buffer;
-} deviceData;
+static uint32_t data;
 
 //-- Hardware Handles
-
-static void *hexport_green_led;  // handle to 32-bit output PIO
-static void *hexport_red_led;   // handle to 32-bit output PIO
-static void *hexport_seven_displays_4;  // handle to 32-bit output PIO
-static void *hexport_seven_displays_2;  // handle to 32-bit output PIO
-static void *inport_switches;   // handle to 32-bit input PIO
-static void *inport_buttons;   // handle to 32-bit input PIO
+static void *hexport_green_led;
+static void *hexport_red_led;
+static void *hexport_seven_displays_4;
+static void *hexport_seven_displays_2;
+static void *inport_switches;   
+static void *inport_buttons;   
 
 //-- Char Driver Interface
 static int   MAJOR_NUMBER = 91;
-
 static int     char_device_open    ( struct inode * , struct file *);
 static int     char_device_release ( struct inode * , struct file *);
 static ssize_t char_device_read    ( struct file * , char *,       size_t , loff_t *);
@@ -49,6 +41,8 @@ static struct file_operations file_opts = {
    .release = char_device_release
 };
 
+
+// Driver functions implementations
 static int char_device_open(struct inode *inodep, struct file *filep) {
    printk(KERN_ALERT "altera_driver: device opened.\n");
    return 0;
@@ -59,71 +53,42 @@ static int char_device_release(struct inode *inodep, struct file *filep) {
    return 0;
 }
 
-static ssize_t char_device_read(struct file *filep, char *buf, size_t len, loff_t *off) {
-
-  deviceData *n = (deviceData *) buf;
-  size_t count = len;
-
-  if(n->id == switches) {
-    int switches_buffer;
-    while (len > 0) {
-      switches_buffer = ioread32(inport_switches);
-      put_user(switches_buffer & 0xFF, n->buffer++);
-      len -= 4;
-    }
-  } else if(n->id == buttons) {
-    int buttons_buffer;
-    while (len > 0) {
-      buttons_buffer = ioread32(inport_buttons);
-      put_user(buttons_buffer, n->buffer++);
-      len -= 4;
-    }
-  }
-  
-  return count;
+static ssize_t char_device_read(struct file *filep, char *buf, size_t opt, loff_t *off) {
+	data = 0;
+	if(opt == SWITCHES){
+		data = ioread32(inport_switches);
+	} else if(opt == BUTTONS) {
+		data = ioread32(inport_buttons);
+	}
+	
+	copy_to_user(buf, &data, sizeof(uint32_t));
+	printk(KERN_ALERT "Mandando o dado: %d, referente ao dispositivo %d", data, opt);
+	
+	return 4;
 }
 
-static ssize_t char_device_write(struct file *filep, const char *buf, size_t len, loff_t *off) {
-  
-  deviceData *ptr = (deviceData *) buf;
-  size_t count = len;
-  
-  int b = 0;
-
-  if(n->id == green_led) {
-    while (b < len) {
-        unsigned k = *((int *) ptr);
-        ptr += 4;
-        b   += 4;
-        iowrite32(k, hexport_green_led);
-    }
-  }else if(n->id == red_led) {
-    while (b < len) {
-        unsigned k = *((int *) ptr);
-        ptr += 4;
-        b += 4;
-        iowrite32(k, hexport_red_led)
-    }
-  }else if(n->id == seven_displays_4) {
-    while (b < len) {
-        unsigned k = *((int *) ptr);
-        ptr += 4;
-        b += 4;
-        iowrite32(k, hexport_seven_displays_4)
-    }
-  }else if(n->id == seven_displays_2) {
-     while (b < len) {
-        unsigned k = *((int *) ptr);
-        ptr += 4;
-        b += 4;
-        iowrite32(k, hexport_seven_displays_2)
-    }
-  }
-  
-  return count;
+static ssize_t char_device_write(struct file *filep, const char *buf, size_t opt, loff_t *off) {
+	data = 0;
+	copy_from_user(&data, buf, sizeof(uint32_t));
+	
+	if(opt == GREEN_LED) {
+		iowrite32(data, hexport_green_led);
+	} else if(opt == RED_LED) {
+		iowrite32(data, buf, hexport_red_led);
+	} else if(opt == SEVEN_DISPLAYS_4) {
+		iowrite32(data, buf, hexport_seven_displays_4);
+	} else if(opt == SEVEN_DISPLAYS_2) {
+		iowrite32(data, buf, hexport_seven_displays_2);
+	}
+	
+	printk(KERN_ALERT "Wrote in device %d the value: %d", opt, data);
+	return 4;
 }
 
 //-- PCI Device Interface
+
+static int pci_probe(struct pci_dev *dev, const struct pci_device_id *id);
+static void pci_remove(struct pci_dev *dev);
 
 static struct pci_device_id pci_ids[] = {
   { PCI_DEVICE(0x1172, 0x0004), },
@@ -131,11 +96,8 @@ static struct pci_device_id pci_ids[] = {
 };
 MODULE_DEVICE_TABLE(pci, pci_ids);
 
-static int pci_probe(struct pci_dev *dev, const struct pci_device_id *id);
-static void pci_remove(struct pci_dev *dev);
-
 static struct pci_driver pci_driver = {
-  .name     = "alterahello",
+  .name     = "SoundBoard",
   .id_table = pci_ids,
   .probe    = pci_probe,
   .remove   = pci_remove,
@@ -166,13 +128,12 @@ static int pci_probe(struct pci_dev *dev, const struct pci_device_id *id) {
   resource = pci_resource_start(dev, 0);
   printk(KERN_ALERT "altera_driver: Resource start at bar 0: %lx\n", resource);
 
-  hexport_green_led = ioremap_nocache(resource + 0XC000, 0x20);
-  hexport_red_led = ioremap_nocache(resource + 0XC000, 0x20);
+  hexport_green_led = ioremap_nocache(resource + 0XC0F0, 0x20);
+  hexport_red_led = ioremap_nocache(resource + 0XC0B0, 0x20);
   hexport_seven_displays_4 = ioremap_nocache(resource + 0XC000, 0x20);
-  hexport_seven_displays_2 = ioremap_nocache(resource + 0XC000, 0x20);
-
-  inport_switches = ioremap_nocache(resource + 0XC020, 0x20);
-  inport_buttons = ioremap_nocache(resource + 0XC020, 0x20);
+  hexport_seven_displays_2 = ioremap_nocache(resource + 0XC140, 0x20);
+  inport_switches = ioremap_nocache(resource + 0XC040, 0x20);
+  inport_buttons = ioremap_nocache(resource + 0XC080, 0x20);
 
   return 0;
 }
