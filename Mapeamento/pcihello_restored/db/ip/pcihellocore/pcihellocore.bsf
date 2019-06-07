@@ -1,0 +1,167 @@
+/*
+WARNING: Do NOT edit the input and output ports in this file in a text
+editor if you plan to continue editing the block that represents it in
+the Block Editor! File corruption is VERY likely to occur.
+*/
+/*
+Copyright (C) 2017  Intel Corporation. All rights reserved.
+Your use of Intel Corporation's design tools, logic functions 
+and other software and tools, and its AMPP partner logic 
+functions, and any output files from any of the foregoing 
+(including device programming or simulation files), and any 
+associated documentation or information are expressly subject 
+to the terms and conditions of the Intel Program License 
+Subscription Agreement, the Intel Quartus Prime License Agreement,
+the Intel MegaCore Function License Agreement, or other 
+applicable license agreement, including, without limitation, 
+that your use is for the sole purpose of programming logic 
+devices manufactured by Intel and sold by Intel or its 
+authorized distributors.  Please refer to the applicable 
+agreement for further details.
+*/
+(header "symbol" (version "1.1"))
+(symbol
+	(rect 0 0 672 520)
+	(text "pcihellocore" (rect 302 -1 346 11)(font "Arial" (font_size 10)))
+	(text "inst" (rect 8 504 20 516)(font "Arial" ))
+	(port
+		(pt 0 72)
+		(input)
+		(text "buttons_external_connection_export[31..0]" (rect 0 0 166 12)(font "Arial" (font_size 8)))
+		(text "buttons_external_connection_export[31..0]" (rect 4 61 250 72)(font "Arial" (font_size 8)))
+		(line (pt 0 72)(pt 288 72)(line_width 3))
+	)
+	(port
+		(pt 0 272)
+		(input)
+		(text "pcie_hard_ip_0_pcie_rstn_export" (rect 0 0 134 12)(font "Arial" (font_size 8)))
+		(text "pcie_hard_ip_0_pcie_rstn_export" (rect 4 261 190 272)(font "Arial" (font_size 8)))
+		(line (pt 0 272)(pt 288 272)(line_width 1))
+	)
+	(port
+		(pt 0 312)
+		(input)
+		(text "pcie_hard_ip_0_powerdown_pll_powerdown" (rect 0 0 173 12)(font "Arial" (font_size 8)))
+		(text "pcie_hard_ip_0_powerdown_pll_powerdown" (rect 4 301 232 312)(font "Arial" (font_size 8)))
+		(line (pt 0 312)(pt 288 312)(line_width 1))
+	)
+	(port
+		(pt 0 328)
+		(input)
+		(text "pcie_hard_ip_0_powerdown_gxb_powerdown" (rect 0 0 180 12)(font "Arial" (font_size 8)))
+		(text "pcie_hard_ip_0_powerdown_gxb_powerdown" (rect 4 317 232 328)(font "Arial" (font_size 8)))
+		(line (pt 0 328)(pt 288 328)(line_width 1))
+	)
+	(port
+		(pt 0 368)
+		(input)
+		(text "pcie_hard_ip_0_refclk_export" (rect 0 0 120 12)(font "Arial" (font_size 8)))
+		(text "pcie_hard_ip_0_refclk_export" (rect 4 357 172 368)(font "Arial" (font_size 8)))
+		(line (pt 0 368)(pt 288 368)(line_width 1))
+	)
+	(port
+		(pt 0 408)
+		(input)
+		(text "pcie_hard_ip_0_rx_in_rx_datain_0" (rect 0 0 140 12)(font "Arial" (font_size 8)))
+		(text "pcie_hard_ip_0_rx_in_rx_datain_0" (rect 4 397 196 408)(font "Arial" (font_size 8)))
+		(line (pt 0 408)(pt 288 408)(line_width 1))
+	)
+	(port
+		(pt 0 488)
+		(input)
+		(text "switchs_external_connection_export[31..0]" (rect 0 0 166 12)(font "Arial" (font_size 8)))
+		(text "switchs_external_connection_export[31..0]" (rect 4 477 250 488)(font "Arial" (font_size 8)))
+		(line (pt 0 488)(pt 288 488)(line_width 3))
+	)
+	(port
+		(pt 0 112)
+		(output)
+		(text "display_seven_left_external_connection_export[31..0]" (rect 0 0 213 12)(font "Arial" (font_size 8)))
+		(text "display_seven_left_external_connection_export[31..0]" (rect 4 101 316 112)(font "Arial" (font_size 8)))
+		(line (pt 0 112)(pt 288 112)(line_width 3))
+	)
+	(port
+		(pt 0 152)
+		(output)
+		(text "display_seven_right_external_connection_export[31..0]" (rect 0 0 218 12)(font "Arial" (font_size 8)))
+		(text "display_seven_right_external_connection_export[31..0]" (rect 4 141 322 152)(font "Arial" (font_size 8)))
+		(line (pt 0 152)(pt 288 152)(line_width 3))
+	)
+	(port
+		(pt 0 192)
+		(output)
+		(text "ledgreen_external_connection_export[31..0]" (rect 0 0 171 12)(font "Arial" (font_size 8)))
+		(text "ledgreen_external_connection_export[31..0]" (rect 4 181 256 192)(font "Arial" (font_size 8)))
+		(line (pt 0 192)(pt 288 192)(line_width 3))
+	)
+	(port
+		(pt 0 232)
+		(output)
+		(text "ledred_external_connection_export[31..0]" (rect 0 0 161 12)(font "Arial" (font_size 8)))
+		(text "ledred_external_connection_export[31..0]" (rect 4 221 244 232)(font "Arial" (font_size 8)))
+		(line (pt 0 232)(pt 288 232)(line_width 3))
+	)
+	(port
+		(pt 0 448)
+		(output)
+		(text "pcie_hard_ip_0_tx_out_tx_dataout_0" (rect 0 0 149 12)(font "Arial" (font_size 8)))
+		(text "pcie_hard_ip_0_tx_out_tx_dataout_0" (rect 4 437 208 448)(font "Arial" (font_size 8)))
+		(line (pt 0 448)(pt 288 448)(line_width 1))
+	)
+	(drawing
+		(text "buttons_external_connection" (rect 123 43 408 99)(font "Arial" (color 128 0 0)(font_size 9)))
+		(text "export" (rect 293 67 622 144)(font "Arial" (color 0 0 0)))
+		(text "display_seven_left_external_connection" (rect 57 83 342 179)(font "Arial" (color 128 0 0)(font_size 9)))
+		(text "export" (rect 293 107 622 224)(font "Arial" (color 0 0 0)))
+		(text "display_seven_right_external_connection" (rect 50 123 334 259)(font "Arial" (color 128 0 0)(font_size 9)))
+		(text "export" (rect 293 147 622 304)(font "Arial" (color 0 0 0)))
+		(text "ledgreen_external_connection" (rect 116 163 400 339)(font "Arial" (color 128 0 0)(font_size 9)))
+		(text "export" (rect 293 187 622 384)(font "Arial" (color 0 0 0)))
+		(text "ledred_external_connection" (rect 130 203 416 419)(font "Arial" (color 128 0 0)(font_size 9)))
+		(text "export" (rect 293 227 622 464)(font "Arial" (color 0 0 0)))
+		(text "pcie_hard_ip_0_pcie_rstn" (rect 137 243 418 499)(font "Arial" (color 128 0 0)(font_size 9)))
+		(text "export" (rect 293 267 622 544)(font "Arial" (color 0 0 0)))
+		(text "pcie_hard_ip_0_powerdown" (rect 124 283 392 579)(font "Arial" (color 128 0 0)(font_size 9)))
+		(text "pll_powerdown" (rect 293 307 664 624)(font "Arial" (color 0 0 0)))
+		(text "gxb_powerdown" (rect 293 323 664 656)(font "Arial" (color 0 0 0)))
+		(text "pcie_hard_ip_0_refclk" (rect 158 339 442 691)(font "Arial" (color 128 0 0)(font_size 9)))
+		(text "export" (rect 293 363 622 736)(font "Arial" (color 0 0 0)))
+		(text "pcie_hard_ip_0_rx_in" (rect 162 379 444 771)(font "Arial" (color 128 0 0)(font_size 9)))
+		(text "rx_datain_0" (rect 293 403 652 816)(font "Arial" (color 0 0 0)))
+		(text "pcie_hard_ip_0_tx_out" (rect 155 419 436 851)(font "Arial" (color 128 0 0)(font_size 9)))
+		(text "tx_dataout_0" (rect 293 443 658 896)(font "Arial" (color 0 0 0)))
+		(text "switchs_external_connection" (rect 122 459 406 931)(font "Arial" (color 128 0 0)(font_size 9)))
+		(text "export" (rect 293 483 622 976)(font "Arial" (color 0 0 0)))
+		(text " pcihellocore " (rect 619 504 1322 1018)(font "Arial" ))
+		(line (pt 288 32)(pt 384 32)(line_width 1))
+		(line (pt 384 32)(pt 384 504)(line_width 1))
+		(line (pt 288 504)(pt 384 504)(line_width 1))
+		(line (pt 288 32)(pt 288 504)(line_width 1))
+		(line (pt 289 52)(pt 289 76)(line_width 1))
+		(line (pt 290 52)(pt 290 76)(line_width 1))
+		(line (pt 289 92)(pt 289 116)(line_width 1))
+		(line (pt 290 92)(pt 290 116)(line_width 1))
+		(line (pt 289 132)(pt 289 156)(line_width 1))
+		(line (pt 290 132)(pt 290 156)(line_width 1))
+		(line (pt 289 172)(pt 289 196)(line_width 1))
+		(line (pt 290 172)(pt 290 196)(line_width 1))
+		(line (pt 289 212)(pt 289 236)(line_width 1))
+		(line (pt 290 212)(pt 290 236)(line_width 1))
+		(line (pt 289 252)(pt 289 276)(line_width 1))
+		(line (pt 290 252)(pt 290 276)(line_width 1))
+		(line (pt 289 292)(pt 289 332)(line_width 1))
+		(line (pt 290 292)(pt 290 332)(line_width 1))
+		(line (pt 289 348)(pt 289 372)(line_width 1))
+		(line (pt 290 348)(pt 290 372)(line_width 1))
+		(line (pt 289 388)(pt 289 412)(line_width 1))
+		(line (pt 290 388)(pt 290 412)(line_width 1))
+		(line (pt 289 428)(pt 289 452)(line_width 1))
+		(line (pt 290 428)(pt 290 452)(line_width 1))
+		(line (pt 289 468)(pt 289 492)(line_width 1))
+		(line (pt 290 468)(pt 290 492)(line_width 1))
+		(line (pt 0 0)(pt 672 0)(line_width 1))
+		(line (pt 672 0)(pt 672 520)(line_width 1))
+		(line (pt 0 520)(pt 672 520)(line_width 1))
+		(line (pt 0 0)(pt 0 520)(line_width 1))
+	)
+)
