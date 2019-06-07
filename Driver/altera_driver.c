@@ -69,16 +69,17 @@ static ssize_t char_device_read(struct file *filep, char *buf, size_t opt, loff_
 
 static ssize_t char_device_write(struct file *filep, const char *buf, size_t opt, loff_t *off) {
 	data = 0;
+  printk(KERN_ALERT "Estamos aqui lindos");
 	copy_from_user(&data, buf, sizeof(uint32_t));
 	
 	if(opt == GREEN_LED) {
 		iowrite32(data, hexport_green_led);
 	} else if(opt == RED_LED) {
-		iowrite32(data, buf, hexport_red_led);
+		iowrite32(data, hexport_red_led);
 	} else if(opt == SEVEN_DISPLAYS_4) {
-		iowrite32(data, buf, hexport_seven_displays_4);
+		iowrite32(data, hexport_seven_displays_4);
 	} else if(opt == SEVEN_DISPLAYS_2) {
-		iowrite32(data, buf, hexport_seven_displays_2);
+		iowrite32(data, hexport_seven_displays_2);
 	}
 	
 	printk(KERN_ALERT "Wrote in device %d the value: %d", opt, data);
