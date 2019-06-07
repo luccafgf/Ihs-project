@@ -59,18 +59,26 @@ static ssize_t char_device_read(struct file *filep, char *buf, size_t opt, loff_
 		data = ioread32(inport_switches);
 	} else if(opt == BUTTONS) {
 		data = ioread32(inport_buttons);
-	}
+	} else if(opt == SEVEN_DISPLAYS_4) {
+    data = ioread32(hexport_seven_displays_4);
+  } else if(opt == SEVEN_DISPLAYS_2) {
+    data = ioread32(hexport_seven_displays_2);
+  } else if(opt == GREEN_LED) {
+    data = ioread32(hexport_green_led);
+  } else if(opt == RED_LED) {
+    data = ioread32(hexport_red_led);
+  }
 	
 	copy_to_user(buf, &data, sizeof(uint32_t));
-	printk(KERN_ALERT "Mandando o dado: %d, referente ao dispositivo %d", data, opt);
+	printk(KERN_ALERT "Mandando o dado: %d, referente ao dispositivo %u", data, opt);
 	
 	return 4;
 }
 
 static ssize_t char_device_write(struct file *filep, const char *buf, size_t opt, loff_t *off) {
 	data = 0;
-  printk(KERN_ALERT "Estamos aqui lindos");
 	copy_from_user(&data, buf, sizeof(uint32_t));
+  printk(KERN_ALERT "Data: %u", data);
 	
 	if(opt == GREEN_LED) {
 		iowrite32(data, hexport_green_led);
@@ -82,7 +90,7 @@ static ssize_t char_device_write(struct file *filep, const char *buf, size_t opt
 		iowrite32(data, hexport_seven_displays_2);
 	}
 	
-	printk(KERN_ALERT "Wrote in device %d the value: %d", opt, data);
+	printk(KERN_ALERT "Wrote in device %d the value: %u", opt, data);
 	return 4;
 }
 
