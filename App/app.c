@@ -40,6 +40,10 @@
 #define DISPLAY_F 			14
 
 void changeDisplay(int altera, int display, uint32_t value);
+void readSwitch(int altera);
+void changeLedRed(int altera, uint32_t value);
+void readButton(int altera);
+void reset(int altera);
 
 void delay(int num_of_mili) {
 	int mili_sec = 1000*num_of_mili;
@@ -53,10 +57,9 @@ int main() {
   
   const uint32_t led_1 = 3, led_2 = 65535, led_3 = 142545, led_4 = 192;
 
-  changeDisplay(altera, DISPLAY_HEX0, DISPLAY_F);
-  changeDisplay(altera, DISPLAY_HEX1, DISPLAY_A);
-  changeDisplay(altera, DISPLAY_HEX2, DISPLAY_C);
-  changeDisplay(altera, DISPLAY_HEX3, DISPLAY_E);
+  //changeDisplay(altera, DISPLAY_HEX0, DISPLAY_A);
+  //readSwitch(altera);
+  reset(altera);
 
   close(altera);
   return 0;
@@ -70,14 +73,39 @@ void start() {
 
 } 
 
+void reset(int altera){
+	uint32_t valueDisplay = 4294967295; 
+	write(altera, &valueDisplay, SEVEN_DISPLAYS_4);
+	write(altera, &valueDisplay, SEVEN_DISPLAYS_2);
+	readSwitch(altera);
+}
+
+void readSwitch(int altera){
+	uint32_t actualValue = 0;
+
+	read(altera, &actualValue, SWITCHES);
+	changeLedRed(altera, actualValue);
+}
+
+void changeLedRed(int altera, uint32_t value){
+	write(altera, &value, RED_LED);
+}
+
+void readButton(int altera){
+	uint32_t actualValue = 0;
+
+	read(altera, &actualValue, BUTTONS);
+	printf("botao: %u\n", actualValue);
+}
+
 void changeDisplay(int altera, int display, uint32_t value) {
 
 	uint32_t actualValue = 0;
+	
 
 	switch(display) {
 	case DISPLAY_HEX0:
 		read(altera, &actualValue, SEVEN_DISPLAYS_4);
-		//printf("HEX0 antes: %u \n", actualValue);
 		actualValue = ((actualValue & 0xffffff00) | value);
 		//printf("HEX0 depois: %u \n", actualValue);
 		write(altera, &actualValue, SEVEN_DISPLAYS_4);
@@ -133,6 +161,7 @@ void changeDisplay(int altera, int display, uint32_t value) {
 	default:
 		break;
 	}
+
 
 }
 
