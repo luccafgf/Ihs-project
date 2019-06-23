@@ -44,6 +44,9 @@ void readSwitch(int altera);
 void changeLedRed(int altera, uint32_t value);
 void readButton(int altera);
 void reset(int altera);
+void threadINPUT(int altera);
+
+int playing = 0; 
 
 void delay(int num_of_mili) {
 	int mili_sec = 1000*num_of_mili;
@@ -57,33 +60,56 @@ int main() {
   
   const uint32_t led_1 = 3, led_2 = 65535, led_3 = 142545, led_4 = 192;
 
-  //changeDisplay(altera, DISPLAY_HEX0, DISPLAY_A);
+  //changeDisplay(altera, DISPLAY_HEX2, DISPLAY_C);
   //readSwitch(altera);
   reset(altera);
+  //readButton(altera);
+  #pragma omp parallel 
+  {
+  	#pragma omp master
+  	{
+  		//modo programador
+  		threadINPUT(altera);
+		//close(altera);
+	}
+  }
 
-  close(altera);
   return 0;
+
 }
 
 void setup() {	
 
 }
 
-void start() {
+void start() {	
 
 } 
 
+void threadINPUT(int altera){
+	while(1){
+		readSwitch(altera);
+		sleep(0.1);
+		readButton(altera);
+	}
+}
+
 void reset(int altera){
-	uint32_t valueDisplay = 4294967295; 
+	//printf("OLAR\n");
+	uint32_t valueDisplay = -1; 
+	uint32_t aux = 0;
 	write(altera, &valueDisplay, SEVEN_DISPLAYS_4);
 	write(altera, &valueDisplay, SEVEN_DISPLAYS_2);
+	write(altera, &aux, GREEN_LED);
 	readSwitch(altera);
 }
 
 void readSwitch(int altera){
 	uint32_t actualValue = 0;
+	static int oldStatus;
 
 	read(altera, &actualValue, SWITCHES);
+	delay(100);
 	changeLedRed(altera, actualValue);
 }
 
@@ -93,8 +119,42 @@ void changeLedRed(int altera, uint32_t value){
 
 void readButton(int altera){
 	uint32_t actualValue = 0;
-
+	static uint32_t oldValue = 15;
+	
 	read(altera, &actualValue, BUTTONS);
+	delay(100);
+	if(actualValue != oldValue){
+
+		if(actualValue == 15){
+			switch(oldValue){
+				case 14:
+					playing = !playing;
+					printf("TÁ TOCANDO O BAGUIO\n");
+					break;
+
+				case 13:
+					printf("ESCOLHI \n");
+					break;
+
+				case 11:
+					printf("AUMENTEI NOTA \n");
+					break;
+
+				case 7:
+					printf("DIMINUI NOTA \n");
+					break;
+
+				default:
+					printf("sou v1d4 l0k4 \n");
+					break;
+			}	
+		}
+
+		oldValue = actualValue;
+
+	}
+	 
+
 	printf("botao: %u\n", actualValue);
 }
 
