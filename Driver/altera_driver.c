@@ -70,7 +70,7 @@ static ssize_t char_device_read(struct file *filep, char *buf, size_t opt, loff_
   }
 	
 	copy_to_user(buf, &data, sizeof(uint32_t));
-	printk(KERN_ALERT "Mandando o dado: %d, referente ao dispositivo %u", data, opt);
+	printk(KERN_ALERT "Mandando o dado: %u, referente ao dispositivo %u", data, opt);
 	
 	return 4;
 }
@@ -90,7 +90,7 @@ static ssize_t char_device_write(struct file *filep, const char *buf, size_t opt
 		iowrite32(data, hexport_seven_displays_2);
 	}
 	
-	printk(KERN_ALERT "Wrote in device %d the value: %u", opt, data);
+	printk(KERN_ALERT "Wrote in device %u the value: %u", opt, data);
 	return 4;
 }
 

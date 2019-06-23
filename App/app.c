@@ -53,8 +53,10 @@ int main() {
   
   const uint32_t led_1 = 3, led_2 = 65535, led_3 = 142545, led_4 = 192;
 
-  changeDisplay(altera, DISPLAY_HEX0, DISPLAY_C);
-  changeDisplay(altera, DISPLAY_HEX1, DISPLAY_E);
+  changeDisplay(altera, DISPLAY_HEX0, DISPLAY_F);
+  changeDisplay(altera, DISPLAY_HEX1, DISPLAY_A);
+  changeDisplay(altera, DISPLAY_HEX2, DISPLAY_C);
+  changeDisplay(altera, DISPLAY_HEX3, DISPLAY_E);
 
   close(altera);
   return 0;
@@ -75,20 +77,20 @@ void changeDisplay(int altera, int display, uint32_t value) {
 	switch(display) {
 	case DISPLAY_HEX0:
 		read(altera, &actualValue, SEVEN_DISPLAYS_4);
-		printf("HEX0 antes: %u \n", actualValue);
+		//printf("HEX0 antes: %u \n", actualValue);
 		actualValue = ((actualValue & 0xffffff00) | value);
-		printf("HEX0 depois: %u \n", actualValue);
+		//printf("HEX0 depois: %u \n", actualValue);
 		write(altera, &actualValue, SEVEN_DISPLAYS_4);
-		printf("HEX0 final: %u \n", actualValue);
+		//printf("HEX0 final: %u \n", actualValue);
 		delay(100);
 		break;
 	case DISPLAY_HEX1:
 		read(altera, &actualValue, SEVEN_DISPLAYS_4);
-		printf("HEX1 antes: %u \n", actualValue);
+		//printf("HEX1 antes: %u \n", actualValue);
 		actualValue = ((actualValue & 0xffff00ff) | (value << 8));
-		printf("HEX1 depois: %u \n", actualValue);
+		//printf("HEX1 depois: %u \n", actualValue);
 		write(altera, &actualValue, SEVEN_DISPLAYS_4);		
-		printf("HEX1 final: %u \n", actualValue);
+		//printf("HEX1 final: %u \n", actualValue);
 		delay(100);
 		break;
 	case DISPLAY_HEX2:
