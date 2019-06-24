@@ -39,6 +39,7 @@
 #define DISPLAY_D			33
 #define DISPLAY_E 			6
 #define DISPLAY_F 			14
+#define DISPLAY_G 			66
 
 #define POS_CURSOR			0
 
@@ -49,11 +50,13 @@ void readButton(int altera);
 void reset(int altera);
 void threadINPUT(int altera);
 void threadPLAY(int altera);
+void changeNote (int altera, int note);
 
 int playing = 0; 
 int positions[18][2] = {0};
 int switchesOn;
-int cursor =0;
+int cursor = 0;
+int instrumento = 0;
 
 void delay(int num_of_mili) {
 	int mili_sec = 1000*num_of_mili;
@@ -110,17 +113,37 @@ void threadINPUT(int altera){
 
 void threadPLAY(int altera){
 	int new;
+	cursor = 0;
+	int ledinho;
 	while(1){
 		sleep(0.1);
 		if(playing){
 			//modo play
-			sleep(0.3);
+			ledinho = pow(2, cursor);
+
+			changeLedRed(altera, ledinho);
+			if(instrumento == 1){
+				printf("estamos no 1");
+
+			}
+			else if(instrumento == 0){
+				printf("estamos no 0\n");
+
+			}
+			delay(1000);
+			cursor = (cursor+1)%18;
+
 		}
+
 		else{
 			//modo programador
 			new = pow(2,cursor);
+			sleep(0.2);
+			//printf("new:%d\n",new);
+
 			static int old;
 			if(old != new){
+				//printf("\33[2K\r");
 				printf("\n");
 				changeLedRed(altera, new);
 				old = new;
@@ -138,12 +161,15 @@ void reset(int altera){
 	write(altera, &valueDisplay, SEVEN_DISPLAYS_2);
 	write(altera, &aux, GREEN_LED);
 	readSwitch(altera);
+
+	changeNote(altera, aux);
 }
 
 void readSwitch(int altera){
 	uint32_t actualValue = 0;
 	static uint32_t oldValue = 0;
 
+	#pragma omp critical
 	read(altera, &actualValue, SWITCHES);
 
 	if(playing){
@@ -174,42 +200,60 @@ void readSwitch(int altera){
 
 
 void changeLedRed(int altera, uint32_t value){
+	#pragma omp critical
 	write(altera, &value, RED_LED);
 	delay(100);
 }
 
+
 void readButton(int altera){
 	uint32_t actualValue = 0;
 	static uint32_t oldValue = 15;
-	
+	static int nota = 0;
+
+	#pragma omp critical
 	read(altera, &actualValue, BUTTONS);
 	delay(100);
+
 	if(actualValue != oldValue){
 
 		if(actualValue == 15){
 			//printf("cursor: %d\n", cursor);
 			switch(oldValue){
 				case 14: //botao 0
+					cursor = 0;
 					playing = !playing;
 					//printf("valor de playing: %d\n", playing);
 					break;
 
 				case 13: //botao 1
-					printf("ESCOLHENDO NOTA \n");
+					nota = (nota + 1)%7;
+					//printf("n %d\n", nota);
+					changeNote(altera, nota);
+					positions[cursor][1] = nota;
 					break;
 
 				case 11: //botao 2
 					if(cursor == 0){
 						cursor = 17;
+						printf("2: %d\n", cursor);
+
 					}
 					else{
 						cursor = (cursor-1)%18;
+						printf("2: %d\n", cursor);
 					}
+
+					nota = positions[cursor][1];
+  					changeNote(altera, nota);
 					break;
 
 				case 7: //botao 3
 					cursor = (cursor+1)%18;
-					//printf("3: %d", cursor);
+					printf("3: %d\n", cursor);
+					nota = positions[cursor][1];
+  					changeNote(altera, nota);
+
 					break;
 
 				default:
@@ -225,12 +269,48 @@ void readButton(int altera){
 
 	//printf("botao: %u\n", actualValue);
 }
+void changeNote (int altera, int note){
+	switch(note){
+		case 0:
+			changeDisplay(altera, DISPLAY_HEX0, DISPLAY_A);
+			break;
+
+		case 1:
+			changeDisplay(altera, DISPLAY_HEX0, DISPLAY_B);
+			break;
+
+		case 2:
+			changeDisplay(altera, DISPLAY_HEX0, DISPLAY_C);
+			break;
+
+		case 3:
+			changeDisplay(altera, DISPLAY_HEX0, DISPLAY_D);
+			break;
+
+		case 4:
+			changeDisplay(altera, DISPLAY_HEX0, DISPLAY_E);
+			break;
+
+		case 5:
+			changeDisplay(altera, DISPLAY_HEX0, DISPLAY_F);
+			break;
+
+		case 6:
+			changeDisplay(altera, DISPLAY_HEX0, DISPLAY_G);
+			break;
+
+		default:
+			changeDisplay(altera, DISPLAY_HEX0, DISPLAY_ZERO);
+			break;
+
+	}
+}
 
 void changeDisplay(int altera, int display, uint32_t value) {
 
 	uint32_t actualValue = 0;
 	
-
+	#pragma omp critical
 	switch(display) {
 	case DISPLAY_HEX0:
 		read(altera, &actualValue, SEVEN_DISPLAYS_4);
