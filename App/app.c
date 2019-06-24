@@ -5,6 +5,7 @@
 #include <omp.h>
 #include <time.h>
 #include <math.h>
+#include <SDL2/SDL_mixer.h>
 
 
 #define SWITCHES            1
@@ -51,12 +52,14 @@ void reset(int altera);
 void threadINPUT(int altera);
 void threadPLAY(int altera);
 void changeNote (int altera, int note);
+void LoadPiano(Mix_Chunk **Notes);
 
 int playing = 0; 
 int positions[18][2] = {0};
 int switchesOn;
 int cursor = 0;
 int instrumento = 0;
+Mix_Chunk *PianoNotes[7];
 
 void delay(int num_of_mili) {
 	int mili_sec = 1000*num_of_mili;
@@ -66,7 +69,13 @@ void delay(int num_of_mili) {
 
 int main() {
   
+  // Abrir arquivos de drivers
   int altera = open("/dev/de2i150_altera", O_RDWR);
+
+  Mix_Init(MIX_INIT_MID);
+  Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
+
+  LoadPiano(PianoNotes);
   
   const uint32_t led_1 = 3, led_2 = 65535, led_3 = 142545, led_4 = 192;
 
@@ -92,15 +101,12 @@ int main() {
  //close(altera);
 
   return 0;
-
 }
 
 void setup() {	
-
 }
 
 void start() {	
-
 } 
 
 void threadINPUT(int altera){
@@ -114,26 +120,27 @@ void threadINPUT(int altera){
 void threadPLAY(int altera){
 	int new;
 	cursor = 0;
-	int ledinho;
+	int redLedValue;
 	while(1){
 		sleep(0.1);
 		if(playing){
 			//modo play
-			ledinho = pow(2, cursor);
+			redLedValue = pow(2, cursor);
 
-			changeLedRed(altera, ledinho);
-			if(instrumento == 1){
-				printf("estamos no 1");
+			changeLedRed(altera, redLedValue);
+			if(positions[cursor][0]){
 
+				if(instrumento == 1){
+					Mix_PlayChannel(-1, PianoNotes[positions[cursor][1]], 0);
+				}
+				else if(instrumento == 0){
+					Mix_PlayChannel(-1, PianoNotes[positions[cursor][1]], 0);
+				}
 			}
-			else if(instrumento == 0){
-				printf("estamos no 0\n");
-
-			}
-			delay(1000);
+			delay(500);
 			cursor = (cursor+1)%18;
-
 		}
+
 
 		else{
 			//modo programador
@@ -198,13 +205,11 @@ void readSwitch(int altera){
 	//changeLedRed(altera, actualValue);
 }
 
-
 void changeLedRed(int altera, uint32_t value){
 	#pragma omp critical
 	write(altera, &value, RED_LED);
 	delay(100);
 }
-
 
 void readButton(int altera){
 	uint32_t actualValue = 0;
@@ -221,7 +226,7 @@ void readButton(int altera){
 			//printf("cursor: %d\n", cursor);
 			switch(oldValue){
 				case 14: //botao 0
-					cursor = 0;
+					cursor = -1;
 					playing = !playing;
 					//printf("valor de playing: %d\n", playing);
 					break;
@@ -269,6 +274,7 @@ void readButton(int altera){
 
 	//printf("botao: %u\n", actualValue);
 }
+
 void changeNote (int altera, int note){
 	switch(note){
 		case 0:
@@ -369,7 +375,16 @@ void changeDisplay(int altera, int display, uint32_t value) {
 	default:
 		break;
 	}
+}
 
-
+void LoadPiano(Mix_Chunk **Notes) {
+	Notes[0] = Mix_LoadWAV("Samples/bass-d-.wav");
+/*	Notes[1] = Mix_LoadWAV("NomeDoArquivo");
+	Notes[2] = Mix_LoadWAV("NomeDoArquivo");
+	Notes[3] = Mix_LoadWAV("NomeDoArquivo");
+	Notes[4] = Mix_LoadWAV("NomeDoArquivo");
+	Notes[5] = Mix_LoadWAV("NomeDoArquivo");
+	Notes[6] = Mix_LoadWAV("NomeDoArquivo");
+	Notes[7] = Mix_LoadWAV("NomeDoArquivo");*/
 }
 
