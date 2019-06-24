@@ -45,8 +45,11 @@ void changeLedRed(int altera, uint32_t value);
 void readButton(int altera);
 void reset(int altera);
 void threadINPUT(int altera);
+void threadPLAY(int altera);
 
 int playing = 0; 
+int positions[17][1] = {0};
+int switchesOn;
 
 void delay(int num_of_mili) {
 	int mili_sec = 1000*num_of_mili;
@@ -64,15 +67,22 @@ int main() {
   //readSwitch(altera);
   reset(altera);
   //readButton(altera);
-  #pragma omp parallel 
+  #pragma omp parallel num_threads(2)
   {
   	#pragma omp master
   	{
   		//modo programador
   		threadINPUT(altera);
-		//close(altera);
+		
+	}
+	#pragma omp single
+	{
+		//modo play
+		threadPLAY(altera);
 	}
   }
+
+ //close(altera);
 
   return 0;
 
@@ -94,6 +104,19 @@ void threadINPUT(int altera){
 	}
 }
 
+void threadPLAY(int altera){
+	while(1){
+		sleep(0.1);
+		if(playing){
+			//printf("T\n");
+			sleep(0.3);
+		}
+		else{
+
+		}
+	}
+}
+
 void reset(int altera){
 	//printf("OLAR\n");
 	uint32_t valueDisplay = -1; 
@@ -106,11 +129,10 @@ void reset(int altera){
 
 void readSwitch(int altera){
 	uint32_t actualValue = 0;
-	static int oldStatus;
-
 	read(altera, &actualValue, SWITCHES);
+	switchesOn = actualValue;
 	delay(100);
-	changeLedRed(altera, actualValue);
+	//changeLedRed(altera, actualValue);
 }
 
 void changeLedRed(int altera, uint32_t value){
@@ -129,7 +151,7 @@ void readButton(int altera){
 			switch(oldValue){
 				case 14:
 					playing = !playing;
-					printf("TÁ TOCANDO O BAGUIO\n");
+					printf("valor de playing: %d\n", playing);
 					break;
 
 				case 13:
@@ -155,7 +177,7 @@ void readButton(int altera){
 	}
 	 
 
-	printf("botao: %u\n", actualValue);
+	//printf("botao: %u\n", actualValue);
 }
 
 void changeDisplay(int altera, int display, uint32_t value) {
