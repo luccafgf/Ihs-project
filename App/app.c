@@ -56,7 +56,7 @@ void changeNote (int altera, int note);
 void LoadPiano(Mix_Chunk **Notes);
 void LoadGuitarra(Mix_Chunk **Notes);
 void iniciaArduino();
-void readRFID();
+void readRFID(int altera);
 
 int fd; //variavel que vai abrir o arquivo do arduino
 char teste;
@@ -117,7 +117,7 @@ void setup() {
 void start() {	
 } 
 
-void readRFID(){
+void readRFID(int altera){
 	static char oldValue = '0';
 	char aux;
 	#pragma omp critical
@@ -127,9 +127,11 @@ void readRFID(){
 			oldValue = aux;
 			if(aux=='0'){
 				instrumento = 0;
+				changeDisplay(altera, DISPLAY_HEX7, DISPLAY_ZERO);
 			}
 			else{
 				instrumento = 1;
+				changeDisplay(altera, DISPLAY_HEX7, DISPLAY_ONE);
 			}
 			//printf("ins %c\n", instrumento);
 		}
@@ -141,7 +143,7 @@ void threadINPUT(int altera){
 		sleep(0.1);
 		readButton(altera);
 		sleep(0.1);
-		readRFID();
+		readRFID(altera);
 	}
 }
 
@@ -200,6 +202,8 @@ void reset(int altera){
 	readSwitch(altera);
 
 	changeNote(altera, aux);
+	changeDisplay(altera, DISPLAY_HEX7, DISPLAY_ZERO);
+
 }
 
 void readSwitch(int altera){
