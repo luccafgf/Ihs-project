@@ -378,13 +378,12 @@ void changeDisplay(int altera, int display, uint32_t value) {
 }
 
 void LoadPiano(Mix_Chunk **Notes) {
-	Notes[0] = Mix_LoadWAV("Samples/bass-d-.wav");
-/*	Notes[1] = Mix_LoadWAV("NomeDoArquivo");
-	Notes[2] = Mix_LoadWAV("NomeDoArquivo");
-	Notes[3] = Mix_LoadWAV("NomeDoArquivo");
-	Notes[4] = Mix_LoadWAV("NomeDoArquivo");
-	Notes[5] = Mix_LoadWAV("NomeDoArquivo");
-	Notes[6] = Mix_LoadWAV("NomeDoArquivo");
-	Notes[7] = Mix_LoadWAV("NomeDoArquivo");*/
+	Notes[0] = Mix_LoadWAV("Samples/piano_a.wav");
+	Notes[1] = Mix_LoadWAV("Samples/piano_b.wav");
+	Notes[2] = Mix_LoadWAV("Samples/piano_c.wav");
+	Notes[3] = Mix_LoadWAV("Samples/piano_d.wav");
+	Notes[4] = Mix_LoadWAV("Samples/piano_e.wav");
+	Notes[5] = Mix_LoadWAV("Samples/piano_f.wav");
+	Notes[6] = Mix_LoadWAV("Samples/piano_g.wav");
 }
 
