@@ -202,8 +202,7 @@ void reset(int altera){
 	readSwitch(altera);
 
 	changeNote(altera, aux);
-	changeDisplay(altera, DISPLAY_HEX7, DISPLAY_ZERO);
-
+	
 }
 
 void readSwitch(int altera){
