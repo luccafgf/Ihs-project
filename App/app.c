@@ -6,6 +6,7 @@
 #include <time.h>
 #include <math.h>
 #include <SDL2/SDL_mixer.h>
+#include <termios.h>
 
 
 #define SWITCHES            1
@@ -53,13 +54,21 @@ void threadINPUT(int altera);
 void threadPLAY(int altera);
 void changeNote (int altera, int note);
 void LoadPiano(Mix_Chunk **Notes);
+void LoadGuitarra(Mix_Chunk **Notes);
+void iniciaArduino();
+void readRFID();
+
+int fd; //variavel que vai abrir o arquivo do arduino
+char teste;
+
 
 int playing = 0; 
 int positions[18][2] = {0};
 int switchesOn;
 int cursor = 0;
-int instrumento = 0;
+char instrumento = '0';
 Mix_Chunk *PianoNotes[7];
+Mix_Chunk *GuitarraNotes[7];
 
 void delay(int num_of_mili) {
 	int mili_sec = 1000*num_of_mili;
@@ -76,13 +85,11 @@ int main() {
   Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
 
   LoadPiano(PianoNotes);
+  LoadGuitarra(GuitarraNotes);
   
-  const uint32_t led_1 = 3, led_2 = 65535, led_3 = 142545, led_4 = 192;
-
-  //changeDisplay(altera, DISPLAY_HEX2, DISPLAY_C);
-  //readSwitch(altera);
   reset(altera);
-  //readButton(altera);
+  iniciaArduino();
+ 
   #pragma omp parallel num_threads(2)
   {
   	#pragma omp master
@@ -99,6 +106,7 @@ int main() {
   }
 
  //close(altera);
+ //close(fd);
 
   return 0;
 }
@@ -109,11 +117,24 @@ void setup() {
 void start() {	
 } 
 
+void readRFID(){
+	static char oldValue = '0';
+
+	read(fd, &instrumento, 1);
+	if(instrumento != oldValue && (instrumento == '0' || instrumento == '1')){
+
+		oldValue = instrumento;
+		//printf("ins %c\n", instrumento);
+	}
+}
+
 void threadINPUT(int altera){
 	while(1){
 		readSwitch(altera);
 		sleep(0.1);
 		readButton(altera);
+		sleep(0.1);
+		readRFID();
 	}
 }
 
@@ -130,10 +151,10 @@ void threadPLAY(int altera){
 			changeLedRed(altera, redLedValue);
 			if(positions[cursor][0]){
 
-				if(instrumento == 1){
-					Mix_PlayChannel(-1, PianoNotes[positions[cursor][1]], 0);
+				if(instrumento == '1'){
+					Mix_PlayChannel(-1, GuitarraNotes[positions[cursor][1]], 0);
 				}
-				else if(instrumento == 0){
+				else if(instrumento == '0'){
 					Mix_PlayChannel(-1, PianoNotes[positions[cursor][1]], 0);
 				}
 			}
@@ -241,12 +262,12 @@ void readButton(int altera){
 				case 11: //botao 2
 					if(cursor == 0){
 						cursor = 17;
-						printf("2: %d\n", cursor);
+						//printf("2: %d\n", cursor);
 
 					}
 					else{
 						cursor = (cursor-1)%18;
-						printf("2: %d\n", cursor);
+						//printf("2: %d\n", cursor);
 					}
 
 					nota = positions[cursor][1];
@@ -255,7 +276,7 @@ void readButton(int altera){
 
 				case 7: //botao 3
 					cursor = (cursor+1)%18;
-					printf("3: %d\n", cursor);
+					//printf("3: %d\n", cursor);
 					nota = positions[cursor][1];
   					changeNote(altera, nota);
 
@@ -278,31 +299,31 @@ void readButton(int altera){
 void changeNote (int altera, int note){
 	switch(note){
 		case 0:
-			changeDisplay(altera, DISPLAY_HEX0, DISPLAY_A);
-			break;
-
-		case 1:
-			changeDisplay(altera, DISPLAY_HEX0, DISPLAY_B);
-			break;
-
-		case 2:
 			changeDisplay(altera, DISPLAY_HEX0, DISPLAY_C);
 			break;
 
-		case 3:
+		case 1:
 			changeDisplay(altera, DISPLAY_HEX0, DISPLAY_D);
 			break;
 
-		case 4:
+		case 2:
 			changeDisplay(altera, DISPLAY_HEX0, DISPLAY_E);
 			break;
 
-		case 5:
+		case 3:
 			changeDisplay(altera, DISPLAY_HEX0, DISPLAY_F);
 			break;
 
-		case 6:
+		case 4:
 			changeDisplay(altera, DISPLAY_HEX0, DISPLAY_G);
+			break;
+
+		case 5:
+			changeDisplay(altera, DISPLAY_HEX0, DISPLAY_A);
+			break;
+
+		case 6:
+			changeDisplay(altera, DISPLAY_HEX0, DISPLAY_B);
 			break;
 
 		default:
@@ -378,12 +399,49 @@ void changeDisplay(int altera, int display, uint32_t value) {
 }
 
 void LoadPiano(Mix_Chunk **Notes) {
-	Notes[0] = Mix_LoadWAV("Samples/piano_a.wav");
-	Notes[1] = Mix_LoadWAV("Samples/piano_b.wav");
-	Notes[2] = Mix_LoadWAV("Samples/piano_c.wav");
-	Notes[3] = Mix_LoadWAV("Samples/piano_d.wav");
-	Notes[4] = Mix_LoadWAV("Samples/piano_e.wav");
-	Notes[5] = Mix_LoadWAV("Samples/piano_f.wav");
-	Notes[6] = Mix_LoadWAV("Samples/piano_g.wav");
+	Notes[0] = Mix_LoadWAV("Samples/piano_c.wav");
+	Notes[1] = Mix_LoadWAV("Samples/piano_d.wav");
+	Notes[2] = Mix_LoadWAV("Samples/piano_e.wav");
+	Notes[3] = Mix_LoadWAV("Samples/piano_f.wav");
+	Notes[4] = Mix_LoadWAV("Samples/piano_g.wav");
+	Notes[5] = Mix_LoadWAV("Samples/piano_a.wav");
+	Notes[6] = Mix_LoadWAV("Samples/piano_b.wav");
 }
 
+void LoadGuitarra(Mix_Chunk **Notes) {
+	Notes[0] = Mix_LoadWAV("Samples/guitar_c.wav");
+	Notes[1] = Mix_LoadWAV("Samples/guitar_d.wav");
+	Notes[2] = Mix_LoadWAV("Samples/guitar_e.wav");
+	Notes[3] = Mix_LoadWAV("Samples/guitar_f.wav");
+	Notes[4] = Mix_LoadWAV("Samples/guitar_g.wav");
+	Notes[5] = Mix_LoadWAV("Samples/guitar_a.wav");
+	Notes[6] = Mix_LoadWAV("Samples/guitar_b.wav");
+}
+
+void iniciaArduino(){
+	struct termios config;
+
+   const char *arduino = "/dev/ttyACM0";
+
+   fd = open(arduino, O_RDWR | O_NOCTTY | O_NDELAY);
+   if(fd == -1)
+  		printf("Failed to open Device: %s\n", arduino);
+   if(!isatty(fd))
+		printf("%s is not a Serial Device\n", arduino);
+
+	if(tcgetattr(fd, &config) < 0)
+	    printf("Error while getting Device Configuration\n");
+
+	config.c_iflag      &= ~(IGNBRK | BRKINT | ICRNL | INLCR | PARMRK | INPCK | ISTRIP | IXON);
+	config.c_oflag      = 0;
+	config.c_lflag      &= ~(ECHO | ECHONL | ICANON | IEXTEN | ISIG);
+	config.c_cflag      &= ~(CSIZE | PARENB);
+	config.c_cflag      |= CS8;
+	config.c_cc[VMIN]   = 1;     // One input byte is enough to return from read()
+	config.c_cc[VTIME]  = 0;
+
+	if(cfsetispeed(&config, B9600) < 0 || cfsetospeed(&config, B9600) < 0)
+	    printf("Error while setting Communication Speed\n");
+	if(tcsetattr(fd, TCSAFLUSH, &config) < 0)
+	    printf("Error while updating Device Configuration\n");
+}

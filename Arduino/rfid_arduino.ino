@@ -6,6 +6,7 @@
 #define LED_R 2//LED Vermelho
 #define LED_G 3 //LED Verde
 char st[20];
+char last_char;
  
 MFRC522 mfrc522(SS_PIN, RST_PIN);
  
@@ -43,10 +44,16 @@ void loop()
  
    if (conteudo.substring(1) == "6C 9A 62 9B") //ID CARTÃO MACIEL
   {
-    Serial.println("0");
+    if(last_char != '0'){
+      Serial.println("0");
+      last_char = '0';
+    }
   }
   if (conteudo.substring(1) == "6A A5 8A 36") //ID CARTÃO LUCCA
   {
-    Serial.println("1");
+    if(last_char != '1'){
+      Serial.println("1");
+      last_char = '1';
   }
+}
 }
