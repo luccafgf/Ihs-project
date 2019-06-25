@@ -66,7 +66,7 @@ int playing = 0;
 int positions[18][2] = {0};
 int switchesOn;
 int cursor = 0;
-char instrumento = '0';
+int instrumento = 0;
 Mix_Chunk *PianoNotes[7];
 Mix_Chunk *GuitarraNotes[7];
 
@@ -119,13 +119,20 @@ void start() {
 
 void readRFID(){
 	static char oldValue = '0';
-
-	read(fd, &instrumento, 1);
-	if(instrumento != oldValue && (instrumento == '0' || instrumento == '1')){
-
-		oldValue = instrumento;
-		//printf("ins %c\n", instrumento);
-	}
+	char aux;
+	#pragma omp critical
+		read(fd, &aux, 1);
+		if(aux != oldValue && (aux == '0' || aux == '1')){
+			//printf("i: %c\n", instrumento);
+			oldValue = aux;
+			if(aux=='0'){
+				instrumento = 0;
+			}
+			else{
+				instrumento = 1;
+			}
+			//printf("ins %c\n", instrumento);
+		}
 }
 
 void threadINPUT(int altera){
@@ -151,10 +158,12 @@ void threadPLAY(int altera){
 			changeLedRed(altera, redLedValue);
 			if(positions[cursor][0]){
 
-				if(instrumento == '1'){
+				if(instrumento == 1){
+					//printf("1\n");
 					Mix_PlayChannel(-1, GuitarraNotes[positions[cursor][1]], 0);
 				}
-				else if(instrumento == '0'){
+				else if(instrumento == 0){
+					//printf("0\n");
 					Mix_PlayChannel(-1, PianoNotes[positions[cursor][1]], 0);
 				}
 			}
