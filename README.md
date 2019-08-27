@@ -1,5 +1,5 @@
 # SoundBoard
-
+This is a project for an undergraduate curse - Hardware and Software Infrastructure - where we use an FPGA prototyping board to develop something of interest to the team. We decided to work with music using an arduino and an RFID sensor to play with the notes of a guitar and a drums
 
 ## Running
 
